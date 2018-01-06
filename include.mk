@@ -2,7 +2,7 @@ all:
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -Os -ggdb -std=gnu99 --specs=nosys.specs --specs=nano.specs -Werror=double-promotion -ffast-math
+  USE_OPT = -O1 -ggdb -std=gnu99 --specs=nosys.specs --specs=nano.specs -Werror=double-promotion -ffast-math
 endif
 
 USE_OPT += -Wl,--wrap=log10f
@@ -29,7 +29,7 @@ endif
 
 # Enable this if you want link time optimizations (LTO)
 ifeq ($(USE_LTO),)
-  USE_LTO = yes
+  USE_LTO = no
 endif
 
 # If enabled, this option allows to compile the application in THUMB mode.
@@ -118,6 +118,10 @@ ifneq ($(findstring stm32,$(TGT_MCU)),)
   ifneq ($(findstring stm32f3,$(TGT_MCU)),)
     include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
     include $(CHIBIOS)/os/hal/ports/STM32/STM32F3xx/platform.mk
+  endif
+  ifneq ($(findstring stm32f4,$(TGT_MCU)),)
+    include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
+    include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
   endif
   include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 endif
@@ -219,7 +223,7 @@ ULIBDIR =
 # List all user libraries here
 ULIBS = -lm
 
-LDSCRIPT = $(RULESPATH)/ld/$(TGT_MCU)/app.ld
+LDSCRIPT = $(RULESPATH)/ld/$(TGT_MCU)/bl.ld
 
 include $(RULESPATH)/rules.mk
 

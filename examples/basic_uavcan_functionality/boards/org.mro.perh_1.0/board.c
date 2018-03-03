@@ -8,8 +8,8 @@ void boardInit(void) {
 //    palSetPadMode(GPIOA, 11, PAL_MODE_INPUT);
 //    palSetPadMode(GPIOA, 12, PAL_MODE_STM32_ALTERNATE_PUSHPULL);
 
-    // maple-mini LED
-    palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL);
+//    // maple-mini LED
+//    palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL);
     // bluepill LED
 //    palSetPadMode(GPIOC, 13, PAL_MODE_OUTPUT_PUSHPULL);
 

@@ -6,6 +6,23 @@
 #define BOARD_PAL_LINE_CAN_RX PAL_LINE(GPIOA,11)
 #define BOARD_PAL_LINE_CAN_TX PAL_LINE(GPIOA,12)
 
+#define MAPLE
+#if defined(MAPLE)
+#define TXPORT GPIOA
+#define LEDPORT GPIOB
+#define LEDPIN 1
+
+#elif defined(MRO)
+#define TXPORT GPIOA
+#define LEDPORT GPIOA
+#define LEDPIN 4
+#endif
+
+#define CONFIG_LED  palSetPadMode(LEDPORT, LEDPIN, PAL_MODE_OUTPUT_PUSHPULL)
+#define LED_ON palSetPad(LEDPORT, LEDPIN)
+#define LED_OFF palClearPad(LEDPORT, LEDPIN)
+
+
 /*
  * Port A setup.
  * Everything input with pull-up except:

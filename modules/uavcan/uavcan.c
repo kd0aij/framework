@@ -361,14 +361,13 @@ static bool _uavcan_send(struct uavcan_instance_s* instance, const struct uavcan
         false, instance, NULL, NULL, 0
     };
 
-    palTogglePad(GPIOB, 1);
-
     msg_descriptor->serializer_func(msg_data, uavcan_transmit_chunk_handler, &tx_state);
     if (tx_state.failed || !tx_state.frame_list_head) {
         can_free_tx_frames(instance->can_instance, &tx_state.frame_list_head);
         return false;
     }
 
+    LED_ON;
 
     uint32_t can_id = 0;
     can_id |= (uint32_t)(priority&0x1f) << 24;
@@ -425,6 +424,8 @@ static bool _uavcan_send(struct uavcan_instance_s* instance, const struct uavcan
     }
 
     can_enqueue_tx_frames(instance->can_instance, &tx_state.frame_list_head, TIME_INFINITE, NULL);
+
+    LED_OFF;
 
     return true;
 }

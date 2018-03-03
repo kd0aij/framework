@@ -361,6 +361,8 @@ static bool _uavcan_send(struct uavcan_instance_s* instance, const struct uavcan
         false, instance, NULL, NULL, 0
     };
 
+    palTogglePad(GPIOB, 1);
+
     msg_descriptor->serializer_func(msg_data, uavcan_transmit_chunk_handler, &tx_state);
     if (tx_state.failed || !tx_state.frame_list_head) {
         can_free_tx_frames(instance->can_instance, &tx_state.frame_list_head);
@@ -483,10 +485,13 @@ static void uavcan_can_rx_handler(size_t msg_size, const void* msg, void* ctx) {
 
     const struct can_rx_frame_s* frame = msg;
 
+    palSetPadMode(GPIOB, 3, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOB, 3);
     CanardCANFrame canard_frame = convert_can_frame_to_CanardCANFrame(&frame->content);
 
     uint64_t timestamp = micros64();
     canardHandleRxFrame(&instance->canard, &canard_frame, timestamp);
+    palClearPad(GPIOB, 3);
 }
 
 static void stale_transfer_cleanup_task_func(struct worker_thread_timer_task_s* task) {

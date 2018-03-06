@@ -340,9 +340,20 @@ static void worker_thread_insert_timer_task_I(struct worker_thread_s* worker_thr
 
     systime_t task_run_time = task->timer_begin_systime + task->timer_expiration_ticks;
     struct worker_thread_timer_task_s** insert_ptr = &worker_thread->timer_task_list_head;
-    while (*insert_ptr && task_run_time - (*insert_ptr)->timer_begin_systime >= (*insert_ptr)->timer_expiration_ticks) {
+
+//    systime_t time_till_run;
+//    systime_t period;
+//    do {
+//        time_till_run = (systime_t)(task_run_time - (*insert_ptr)->timer_begin_systime);
+//        period = (*insert_ptr)->timer_expiration_ticks;
+//        insert_ptr = &(*insert_ptr)->next;
+//    } while (*insert_ptr && (time_till_run >= period));
+
+    while (*insert_ptr &&
+           (systime_t)(task_run_time - (*insert_ptr)->timer_begin_systime) >= (*insert_ptr)->timer_expiration_ticks) {
         insert_ptr = &(*insert_ptr)->next;
     }
+
     task->next = *insert_ptr;
     *insert_ptr = task;
 }

@@ -26,6 +26,12 @@
 #define PUBSUB_DEFAULT_TOPIC_GROUP default_topic_group
 
 //
+// Timer config
+//
+
+#define MICROS_TIME_RESOLUTION 32
+
+//
 // Misc configs
 //
 

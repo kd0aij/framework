@@ -25,9 +25,6 @@
 #define WT TIMING_WORKER_THREAD
 WORKER_THREAD_DECLARE_EXTERN(WT)
 
-// TODO: that typedef probably belongs in the timing module
-// and then micros64() and micros() should probably consolidated into just microsecond_time_t micros()
-
 static struct {
     uint64_t update_seconds;
     systime_t update_systime;
@@ -45,35 +42,41 @@ RUN_AFTER(WORKER_THREADS_INIT) {
     worker_thread_add_timer_task(&WT, &timing_state_update_task, timing_state_update_task_func, NULL, 5000, true);
 }
 
+/*
 uint32_t millis(void) {
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
     systime_t delta_ticks = systime_now - timing_state[idx].update_systime;
     // assume (CH_CFG_ST_FREQUENCY/1000) > 0
-    uint32_t delta_ms = delta_ticks / (CH_CFG_ST_FREQUENCY / 1000UL);
-    return ((uint32_t)timing_state[idx].update_seconds * 1000UL) + delta_ms;
+    micros_time_t delta_ms = delta_ticks / (CH_CFG_ST_FREQUENCY / 1000UL);
+    return ((micros_time_t)timing_state[idx].update_seconds * 1000UL) + delta_ms;
 }
+*/
 
-uint32_t micros(void) {
+micros_time_t micros(void) {
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
-    uint32_t delta_ticks = systime_now - timing_state[idx].update_systime;
-    // don't assume (CH_CFG_ST_FREQUENCY/1000) > 0
-    uint32_t delta_us = delta_ticks * (1000000UL / CH_CFG_ST_FREQUENCY);
-    return ((uint32_t)timing_state[idx].update_seconds * 1000000UL) + delta_us;
+    micros_time_t delta_ticks = systime_now - timing_state[idx].update_systime;
+    // don't assume (CH_CFG_ST_FREQUENCY/1000000) > 0
+    micros_time_t delta_us = delta_ticks * (1000000UL / CH_CFG_ST_FREQUENCY);
+    return ((micros_time_t)timing_state[idx].update_seconds * 1000000UL) + delta_us;
 }
 
 uint64_t micros64(void) {
+#if (MICROS_TIME_RESOLUTION == 32)
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
     uint32_t delta_ticks = systime_now - timing_state[idx].update_systime;
-    // don't assume (CH_CFG_ST_FREQUENCY/1000) > 0
+    // don't assume (CH_CFG_ST_FREQUENCY/1000000) > 0
     uint32_t delta_us = delta_ticks * (1000000UL / CH_CFG_ST_FREQUENCY);
     return (timing_state[idx].update_seconds * 1000000UL) + delta_us;
+#elif (MICROS_TIME_RESOLUTION == 64)
+    return micros();
+#endif
 }
 
-void usleep(uint32_t delay) {
-    uint32_t tbegin = micros();
+void usleep(micros_time_t delay) {
+    micros_time_t tbegin = micros();
     while (micros() - tbegin < delay);
 }
 

@@ -25,7 +25,7 @@
 #define WT TIMING_WORKER_THREAD
 WORKER_THREAD_DECLARE_EXTERN(WT)
 
-static struct {
+static struct timing_state {
     uint64_t update_seconds;
     systime_t update_systime;
 } timing_state[2];
@@ -39,7 +39,7 @@ static void timing_state_update_task_func(struct worker_thread_timer_task_s* tas
 // This task must run more frequently than the system timer wraps
 // For a 16 bit timer running at 10KHz, the wraparound interval is 6.5536 seconds
 RUN_AFTER(WORKER_THREADS_INIT) {
-    worker_thread_add_timer_task(&WT, &timing_state_update_task, timing_state_update_task_func, NULL, 5000, true);
+    worker_thread_add_timer_task(&WT, &timing_state_update_task, timing_state_update_task_func, NULL, S2US(1), true);
 }
 
 /*

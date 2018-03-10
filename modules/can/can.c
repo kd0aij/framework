@@ -4,7 +4,7 @@
 #include "can_helpers.h"
 #include "string.h"
 #include <common/helpers.h>
-#include <modules/pubsub/pubsub.h>
+//#include <modules/pubsub/pubsub.h>
 #include <modules/worker_thread/worker_thread.h>
 
 #ifndef CAN_TRX_WORKER_THREAD

@@ -29,7 +29,7 @@
 // Timer config
 //
 
-#define MICROS_TIME_RESOLUTION 32
+#define MICROS_TIME_RESOLUTION 64
 
 //
 // Misc configs

@@ -16,7 +16,9 @@
 #include <common/ctor.h>
 #include "timing.h"
 #include <ch.h>
+#include <hal.h>
 #include <modules/worker_thread/worker_thread.h>
+#include <modules/uavcan_debug/uavcan_debug.h>
 
 #ifndef TIMING_WORKER_THREAD
 #error Please define TIMING_WORKER_THREAD in framework_conf.h.
@@ -47,7 +49,7 @@ uint32_t millis(void) {
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
     systime_t delta_ticks = systime_now - timing_state[idx].update_systime;
-    // assume (CH_CFG_ST_FREQUENCY/1000) > 0
+    // assume CH_CFG_ST_FREQUENCY > 1000
     micros_time_t delta_ms = delta_ticks / (CH_CFG_ST_FREQUENCY / 1000UL);
     return ((micros_time_t)timing_state[idx].update_seconds * 1000UL) + delta_ms;
 }
@@ -56,18 +58,19 @@ uint32_t millis(void) {
 micros_time_t micros(void) {
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
-    micros_time_t delta_ticks = systime_now - timing_state[idx].update_systime;
-    // don't assume (CH_CFG_ST_FREQUENCY/1000000) > 0
+    systime_t delta_ticks = systime_now - timing_state[idx].update_systime;
+    // assume CH_CFG_ST_FREQUENCY) <= 1e6
     micros_time_t delta_us = delta_ticks * (1000000UL / CH_CFG_ST_FREQUENCY);
     return ((micros_time_t)timing_state[idx].update_seconds * 1000000UL) + delta_us;
 }
 
+// provide a 64bit version of micros independent of MICROS_TIME_RESOLUTION
 uint64_t micros64(void) {
 #if (MICROS_TIME_RESOLUTION == 32)
     uint8_t idx = timing_state_idx;
     systime_t systime_now = chVTGetSystemTimeX();
-    uint32_t delta_ticks = systime_now - timing_state[idx].update_systime;
-    // don't assume (CH_CFG_ST_FREQUENCY/1000000) > 0
+    systime_t delta_ticks = systime_now - timing_state[idx].update_systime;
+    // assume CH_CFG_ST_FREQUENCY) <= 1e6
     uint32_t delta_us = delta_ticks * (1000000UL / CH_CFG_ST_FREQUENCY);
     return (timing_state[idx].update_seconds * 1000000UL) + delta_us;
 #elif (MICROS_TIME_RESOLUTION == 64)
@@ -82,6 +85,9 @@ void usleep(micros_time_t delay) {
 
 static void timing_state_update_task_func(struct worker_thread_timer_task_s* task) {
     (void)task;
+    CONFIG_LED;
+    LED_TOGGLE;
+
     uint8_t next_timing_state_idx = (timing_state_idx+1) % 2;
 
     systime_t systime_now = chVTGetSystemTimeX();
@@ -89,6 +95,13 @@ static void timing_state_update_task_func(struct worker_thread_timer_task_s* tas
 
     timing_state[next_timing_state_idx].update_seconds = timing_state[timing_state_idx].update_seconds + delta_ticks / CH_CFG_ST_FREQUENCY;
     timing_state[next_timing_state_idx].update_systime = systime_now - (delta_ticks % CH_CFG_ST_FREQUENCY);
+
+    uint32_t update_seconds = timing_state[next_timing_state_idx].update_seconds;
+    systime_t update_systime = timing_state[next_timing_state_idx].update_systime;
+
+    uavcan_send_debug_msg(UAVCAN_PROTOCOL_DEBUG_LOGLEVEL_INFO, "",
+                          "micros: %u, /1000: %u, update_seconds: %u, update_systime: %u",
+                          micros(), (uint32_t)(micros64()/1000), update_seconds, update_systime);
 
     timing_state_idx = next_timing_state_idx;
 }

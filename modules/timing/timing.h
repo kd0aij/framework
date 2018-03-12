@@ -18,9 +18,6 @@
 #include <stdint.h>
 #include <framework_conf.h>
 
-// also add a MICROS_INFINITE constant (microsecond_time_t)(-1)
-// TODO: that typedef probably belongs in the timing module
-// and then micros64() and micros() should probably consolidated into just microsecond_time_t micros()
 #ifndef MICROS_TIME_RESOLUTION
 #define MICROS_TIME_RESOLUTION 64
 #endif

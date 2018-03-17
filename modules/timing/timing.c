@@ -85,7 +85,10 @@ void usleep(micros_time_t delay) {
 
 static void timing_state_update_task_func(struct worker_thread_timer_task_s* task) {
     (void)task;
+
+    // TODO: without this config, the maplemini LED blinks, but not at full brightness
     CONFIG_LED;
+
     LED_TOGGLE;
 
     uint8_t next_timing_state_idx = (timing_state_idx+1) % 2;

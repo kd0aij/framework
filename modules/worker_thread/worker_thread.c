@@ -1,6 +1,4 @@
 #include "worker_thread.h"
-#include <modules/uavcan_debug/uavcan_debug.h>
-
 #include <common/helpers.h>
 
 static THD_FUNCTION(worker_thread_func, arg);

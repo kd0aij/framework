@@ -18,7 +18,9 @@
 #include <ch.h>
 #include <hal.h>
 #include <modules/worker_thread/worker_thread.h>
+#if defined(MODULE_UAVCAN_DEBUG_ENABLED)
 #include <modules/uavcan_debug/uavcan_debug.h>
+#endif
 
 #ifndef TIMING_WORKER_THREAD
 #error Please define TIMING_WORKER_THREAD in framework_conf.h.
@@ -86,10 +88,11 @@ void usleep(micros_time_t delay) {
 static void timing_state_update_task_func(struct worker_thread_timer_task_s* task) {
     (void)task;
 
+#if defined(CONFIG_LED)
     // TODO: without this config, the maplemini LED blinks, but not at full brightness
     CONFIG_LED;
-
     LED_TOGGLE;
+#endif
 
     uint8_t next_timing_state_idx = (timing_state_idx+1) % 2;
 
@@ -99,12 +102,14 @@ static void timing_state_update_task_func(struct worker_thread_timer_task_s* tas
     timing_state[next_timing_state_idx].update_seconds = timing_state[timing_state_idx].update_seconds + delta_ticks / CH_CFG_ST_FREQUENCY;
     timing_state[next_timing_state_idx].update_systime = systime_now - (delta_ticks % CH_CFG_ST_FREQUENCY);
 
+#if defined(MODULE_UAVCAN_DEBUG_ENABLED)
     uint32_t update_seconds = timing_state[next_timing_state_idx].update_seconds;
     systime_t update_systime = timing_state[next_timing_state_idx].update_systime;
 
     uavcan_send_debug_msg(UAVCAN_PROTOCOL_DEBUG_LOGLEVEL_INFO, "",
                           "micros: %u, /1000: %u, update_seconds: %u, update_systime: %u",
                           micros(), (uint32_t)(micros64()/1000), update_seconds, update_systime);
+#endif
 
     timing_state_idx = next_timing_state_idx;
 }

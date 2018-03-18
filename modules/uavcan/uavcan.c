@@ -151,8 +151,10 @@ static void uavcan_init(uint8_t can_dev_idx) {
 
     _uavcan_set_node_id(instance, node_id);
 
+#if HAL_USE_SERIAL
     /* debug message */
     chnWrite(&SD1, (const uint8_t *)"uavcan_init complete\n", 24);
+#endif
 
     return;
 
@@ -370,8 +372,10 @@ static bool _uavcan_send(struct uavcan_instance_s* instance, const struct uavcan
         return false;
     }
 
+#if HAL_USE_SERIAL
     /* debug message */
     chnWrite(&SD1, (const uint8_t *)"snd\n", 5);
+#endif
 
     uint32_t can_id = 0;
     can_id |= (uint32_t)(priority&0x1f) << 24;

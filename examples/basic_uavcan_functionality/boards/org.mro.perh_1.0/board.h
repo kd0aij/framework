@@ -56,3 +56,8 @@
 #define VAL_GPIODCRL            0x88888888      /*  PD7...PD0 */
 #define VAL_GPIODCRH            0x88888888      /* PD15...PD8 */
 #define VAL_GPIODODR            0xFFFFFFFF
+
+// bootloader configuration
+#define BOARD_CONFIG_HW_NAME "org.mro.perh"
+#define BOARD_CONFIG_HW_MAJOR_VER 1
+#define BOARD_CONFIG_HW_MINOR_VER 0

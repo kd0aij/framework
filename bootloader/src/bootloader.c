@@ -15,9 +15,9 @@
 #include <uavcan.protocol.RestartNode.h>
 #include <uavcan.protocol.GetNodeInfo.h>
 
-#if __GNUC__ != 6 || __GNUC_MINOR__ != 3 || __GNUC_PATCHLEVEL__ != 1
-#error Please use arm-none-eabi-gcc 6.3.1.
-#endif
+//#if __GNUC__ != 6 || __GNUC_MINOR__ != 3 || __GNUC_PATCHLEVEL__ != 1
+//#error Please use arm-none-eabi-gcc 6.3.1.
+//#endif
 
 #ifndef BOOTLOADER_APP_THREAD
 #error Please define BOOTLOADER_APP_THREAD in worker_threads_conf.h.
@@ -80,7 +80,7 @@ static void update_app_info(void);
 static void corrupt_app(void);
 static void boot_app_if_commanded(void);
 static void command_boot_if_app_valid(uint8_t boot_reason);
-static void start_boot_timer(uint32_t timeout);
+static void start_boot_timer(micros_time_t timeout);
 static void cancel_boot_timer(void);
 static bool check_and_start_boot_timer(void);
 static void erase_app_page(uint32_t page_num);

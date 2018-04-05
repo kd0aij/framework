@@ -24,7 +24,8 @@ uavcan_allocatee \
 uavcan_restart \
 uavcan_debug \
 stack_measurement \
-freemem_check
+freemem_check \
+driver_gps
 
 MESSAGES_ENABLED = \
 uavcan.protocol.debug.LogMessage
